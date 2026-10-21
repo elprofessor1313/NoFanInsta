@@ -1,0 +1,230 @@
+<div class="app">
+  <header class="top">
+    <div class="top-inner">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">😎</span>
+        <span class="brand-name">T’as cru<br>j’étais ton <em>fan</em>&nbsp;?</span>
+      </div>
+      <nav class="views" role="tablist" aria-label="Sections">
+        <button type="button" role="tab" id="tab-audit" class="view-tab" data-view="audit" aria-selected="true" aria-controls="view-audit">Résultats</button>
+        <button type="button" role="tab" id="tab-exports" class="view-tab" data-view="exports" aria-selected="false" aria-controls="view-exports">Exports <span class="tab-count" id="exports-count"></span></button>
+        <button type="button" role="tab" id="tab-help" class="view-tab" data-view="help" aria-selected="false" aria-controls="view-help">Aide</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <div id="demo-banner" class="banner" hidden>
+      <p><strong>👀 Exemple.</strong> Ces comptes sont inventés. Importe ton export Instagram pour voir les tiens. <button type="button" class="help-link inline" data-goto="help">Comment ça marche ?</button></p>
+      <button type="button" id="demo-import" class="btn btn-small">Importer</button>
+    </div>
+
+    <!-- ============ AUDIT ============ -->
+    <section id="view-audit" role="tabpanel" aria-labelledby="tab-audit">
+      <div class="period" id="period">
+        <div class="period-pickers">
+          <label class="field">
+            <span class="field-label">Du</span>
+            <select id="sel-from"></select>
+          </label>
+          <span class="period-arrow" aria-hidden="true">→</span>
+          <label class="field">
+            <span class="field-label">Au</span>
+            <select id="sel-to"></select>
+          </label>
+        </div>
+        <div class="presets" id="presets" role="group" aria-label="Période rapide">
+          <button type="button" class="chip" data-preset="last">Dernier écart</button>
+          <button type="button" class="chip" data-preset="30">1 mois</button>
+          <button type="button" class="chip" data-preset="90">3 mois</button>
+          <button type="button" class="chip" data-preset="365">1 an</button>
+          <button type="button" class="chip" data-preset="all">Tout</button>
+        </div>
+        <p class="period-note" id="period-note"></p>
+      </div>
+
+      <div class="headline" id="headline"></div>
+
+      <div class="segments" id="segments" role="tablist" aria-label="Listes">
+        <button type="button" role="tab" class="seg" data-seg="lost" aria-selected="true"><span aria-hidden="true">🧐</span> Départs <span class="seg-n" id="n-lost">0</span></button>
+        <button type="button" role="tab" class="seg" data-seg="gained" aria-selected="false"><span aria-hidden="true">🎉</span> Arrivées <span class="seg-n" id="n-gained">0</span></button>
+        <button type="button" role="tab" class="seg" data-seg="noBack" aria-selected="false"><span aria-hidden="true">🙄</span> Sans retour <span class="seg-n" id="n-noBack">0</span></button>
+      </div>
+
+      <div class="toolbar">
+        <label class="search">
+          <span class="visually-hidden">Rechercher un compte</span>
+          <input type="search" id="search" placeholder="Rechercher un compte" autocomplete="off" autocapitalize="off" spellcheck="false">
+        </label>
+        <label class="switch" id="only-following-wrap">
+          <input type="checkbox" id="only-following">
+          <span class="switch-track" aria-hidden="true"></span>
+          <span>Seulement ceux que je suis encore</span>
+        </label>
+        <div class="nb-views" id="noback-views" role="group" aria-label="Afficher" hidden>
+          <button type="button" class="chip" data-nbv="list" aria-pressed="true">Liste</button>
+          <button type="button" class="chip" data-nbv="excluded" aria-pressed="false"><span class="inline-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 8s2.4-4.5 6.5-4.5S14.5 8 14.5 8s-2.4 4.5-6.5 4.5S1.5 8 1.5 8z"/><circle cx="8" cy="8" r="2"/><path d="M2.5 2.5l11 11"/></svg></span> Exclus <span class="chip-n" id="n-excluded">0</span></button>
+          <button type="button" class="chip" data-nbv="ghosts" aria-pressed="false"><span class="inline-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M3 14.2V7.2a5 5 0 0 1 10 0v7L11.3 13l-1.6 1.2L8 13l-1.7 1.2L4.7 13z"/><circle cx="6.2" cy="7.4" r="1" fill="currentColor" stroke="none"/><circle cx="9.8" cy="7.4" r="1" fill="currentColor" stroke="none"/></svg></span> Fantômes <span class="chip-n" id="n-ghosts">0</span></button>
+        </div>
+      </div>
+
+      <p class="seg-help" id="seg-help"></p>
+      <ul class="list" id="list"></ul>
+      <p class="empty" id="list-empty" hidden></p>
+
+      <div class="list-foot">
+        <button type="button" id="export-csv" class="btn btn-ghost">Exporter cette liste (CSV)</button>
+      </div>
+    </section>
+
+    <!-- ============ EXPORTS ============ -->
+    <section id="view-exports" role="tabpanel" aria-labelledby="tab-exports" hidden>
+      <div class="import" id="dropzone">
+        <h2 class="h2">📦 Ajouter un export</h2>
+        <p class="muted">Le fichier .zip reçu d'Instagram, ou ses fichiers <code>followers_1.json</code> et <code>following.json</code>. Rien n'est envoyé à Instagram ni ailleurs.</p>
+        <label for="file-input" class="btn btn-primary btn-block">Choisir le fichier</label>
+        <input type="file" id="file-input" class="visually-hidden" multiple accept=".zip,.json,.html,application/zip,application/json,text/html">
+        <p class="drop-hint">ou dépose-le ici</p>
+        <button type="button" class="help-link" data-goto="help">❓ Je n’ai pas encore mon export</button>
+      </div>
+
+      <div class="draft" id="draft" hidden>
+        <h2 class="h2">🔍 Vérifier l'export</h2>
+        <dl class="draft-stats">
+          <div><dt>Abonnés</dt><dd id="draft-followers">0</dd></div>
+          <div><dt>Abonnements</dt><dd id="draft-following">0</dd></div>
+        </dl>
+        <label class="field field-wide">
+          <span class="field-label">Date de l'export</span>
+          <input type="date" id="draft-date">
+        </label>
+        <p class="field-help">Le jour où tu as demandé l'export à Instagram. C'est cette date qui sert pour les périodes.</p>
+        <ul class="warnings" id="draft-warnings"></ul>
+        <div class="draft-actions">
+          <button type="button" class="btn btn-ghost" id="draft-cancel">Annuler</button>
+          <button type="button" class="btn btn-primary" id="draft-save">Enregistrer l'export</button>
+        </div>
+      </div>
+
+      <div class="section-head">
+        <h2 class="h2">Mes exports</h2>
+        <span class="store-pill" id="store-pill"></span>
+      </div>
+      <ul class="snaps" id="snap-list"></ul>
+      <p class="empty" id="snaps-empty" data-emoji="📭">Aucun export pour l'instant. Commence par en ajouter un : chaque nouvel export pourra être comparé aux précédents.</p>
+
+      <div class="install" id="install-hint" hidden>
+        <h2 class="h2">📱 Installer sur l'iPhone</h2>
+        <p class="muted">Dans Safari, touche <strong>Partager</strong> puis <strong>Sur l'écran d'accueil</strong>. L'app s'ouvrira en plein écran, même hors connexion.</p>
+      </div>
+
+      <button type="button" class="help-link" data-goto="help">❓ Comment obtenir mon export Instagram ?</button>
+
+      <div class="backup">
+        <h2 class="h2">💾 Sauvegarde</h2>
+        <p class="muted" id="store-note"></p>
+        <div class="backup-actions">
+          <button type="button" class="btn btn-ghost" id="backup-export">Exporter une sauvegarde</button>
+          <label for="file-input" class="btn btn-ghost">Restaurer</label>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ AIDE ============ -->
+    <section id="view-help" role="tabpanel" aria-labelledby="tab-help" hidden>
+      <div class="help-hero">
+        <p class="kicker">👋 Mode d’emploi</p>
+        <h2 class="help-title">Qui ne te suit pas en retour ? Qui est parti ? Réponse en 3 étapes.</h2>
+        <p>L’app lit l’export officiel de ton compte Instagram et te montre en un coup d’œil les comptes que tu suis et qui ne te suivent pas, ceux qui se sont désabonnés et tes nouveaux abonnés.</p>
+        <p class="help-safe">🔒 Aucun mot de passe, aucune connexion à Instagram : l’app lit seulement le fichier que tu lui donnes, et rien n’est envoyé ailleurs.</p>
+      </div>
+
+      <div class="help-card">
+        <h2 class="h2"><span class="step-n">1</span> Demande ton export à Instagram</h2>
+        <ol class="steps">
+          <li>Dans Instagram : ton profil, menu <strong>☰</strong>, puis <strong>Espace Comptes</strong>.</li>
+          <li><strong>Vos informations et autorisations</strong> → <strong>Télécharger vos informations</strong>.</li>
+          <li>Choisis <strong>Certaines de vos informations</strong> et coche uniquement <strong>Abonnés et abonnements</strong>.</li>
+          <li>Choisis <strong>Télécharger sur l’appareil</strong>, format <strong>JSON</strong>, période <strong>Depuis le début</strong>, puis envoie la demande.</li>
+          <li>Instagram prépare le fichier (de quelques minutes à quelques heures) et te prévient par notification et par e-mail.</li>
+        </ol>
+        <p class="muted">Le format HTML marche aussi, mais le JSON est plus fiable. Le lien de téléchargement expire au bout de quelques jours : récupère le fichier assez vite.</p>
+      </div>
+
+      <div class="help-card">
+        <h2 class="h2"><span class="step-n">2</span> Ajoute-le dans l’app</h2>
+        <ol class="steps">
+          <li>Télécharge le <strong>.zip</strong> depuis le lien d’Instagram. Sur iPhone, il arrive dans <strong>Fichiers → Téléchargements</strong>.</li>
+          <li>Ouvre l’onglet <strong>Exports</strong>, touche <strong>Choisir le fichier</strong> et sélectionne le .zip. Pas besoin de le décompresser.</li>
+          <li>Vérifie la <strong>date de l’export</strong> (le jour où tu l’as demandé), puis touche <strong>Enregistrer l’export</strong>.</li>
+        </ol>
+        <p class="muted">Tu peux aussi choisir directement les fichiers <code>followers_1.json</code> et <code>following.json</code> trouvés dans le .zip.</p>
+        <button type="button" class="btn btn-primary btn-block" data-goto="exports">📦 Ajouter mon export</button>
+      </div>
+
+      <div class="help-card">
+        <h2 class="h2"><span class="step-n">3</span> Lis tes résultats</h2>
+        <dl class="lists">
+          <div><dt>🙄 Sans retour</dt><dd>Les comptes que tu suis et qui ne te suivent pas. Un seul export suffit.</dd></div>
+          <div><dt>🧐 Départs</dt><dd>Ceux qui te suivaient et ne te suivent plus. Il faut au moins deux exports à des dates différentes : l’app compare les deux. Ceux que tu suis encore sont en tête, surlignés en rose.</dd></div>
+          <div><dt>🎉 Arrivées</dt><dd>Tes nouveaux abonnés entre deux exports.</dd></div>
+        </dl>
+        <p class="muted">Le grand chiffre en haut suit l’onglet choisi. Avec plusieurs exports, choisis la période avec <strong>Du / Au</strong> ou les raccourcis (dernier écart, 1 mois, 3 mois…).</p>
+      </div>
+
+      <div class="help-card">
+        <h2 class="h2">Les boutons de «&nbsp;Sans retour&nbsp;»</h2>
+        <ul class="legend">
+          <li><span class="open">Ouvrir</span><span>Ouvre le profil dans Instagram, pour te désabonner si tu veux.</span></li>
+          <li><span class="excl-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 8s2.4-4.5 6.5-4.5S14.5 8 14.5 8s-2.4 4.5-6.5 4.5S1.5 8 1.5 8z"/><circle cx="8" cy="8" r="2"/><path d="M2.5 2.5l11 11"/></svg></span><span><strong>Exclure.</strong> Une star, un artiste, une marque ? C’est normal qu’ils ne te suivent pas : l’œil barré les retire de «&nbsp;Sans retour&nbsp;», pour cette analyse et les suivantes. Retrouve-les avec le filtre <strong>Exclus</strong>.</span></li>
+          <li><span class="ghost-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M3 14.2V7.2a5 5 0 0 1 10 0v7L11.3 13l-1.6 1.2L8 13l-1.7 1.2L4.7 13z"/><circle cx="6.2" cy="7.4" r="1" fill="currentColor" stroke="none"/><circle cx="9.8" cy="7.4" r="1" fill="currentColor" stroke="none"/></svg></span><span><strong>Fantôme.</strong> Un compte introuvable sur Instagram (désactivé, supprimé, faux compte banni) ? Il traîne encore dans ton export : le fantôme le retire de toutes les listes. Retrouve-les avec le filtre <strong>Fantômes</strong>.</span></li>
+          <li><span class="done-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg></span><span><strong>Traité.</strong> Coche un compte une fois réglé (désabonné, relancé…), pour t’y retrouver.</span></li>
+          <li><span class="chip-sample">🔎</span><span>Cherche un pseudo, ou exporte la liste affichée en <strong>CSV</strong> (bas de page).</span></li>
+        </ul>
+      </div>
+
+      <div class="help-card">
+        <h2 class="h2">⏱️ Suivre dans le temps</h2>
+        <ul class="tips">
+          <li>Refais un export <strong>toutes les une à deux semaines</strong> et ajoute-le : chaque nouvel export est comparé au précédent.</li>
+          <li>Instagram ne date pas les désabonnements : un départ est repéré <strong>entre deux exports</strong>. Plus ils sont rapprochés, plus c’est précis.</li>
+          <li>Un compte supprimé, désactivé ou qui t’a bloqué apparaît aussi comme un départ.</li>
+        </ul>
+      </div>
+
+      <div class="help-card">
+        <h2 class="h2">💾 Tes données</h2>
+        <ul class="tips">
+          <li>Tes exports, tes coches et tes exclus restent <strong>sur ton appareil</strong> (ou dans ton compte Claude si tu utilises l’app depuis Claude). Personne d’autre ne les voit.</li>
+          <li>Si les données du navigateur sont effacées, tout est perdu : fais de temps en temps <strong>Exporter une sauvegarde</strong> (onglet Exports), et <strong>Restaurer</strong> pour tout récupérer.</li>
+        </ul>
+      </div>
+
+      <div class="help-card">
+        <h2 class="h2">📱 L’avoir comme une app sur l’iPhone</h2>
+        <p class="muted">Ouvre l’adresse de l’app dans <strong>Safari</strong>, touche <strong>Partager</strong> puis <strong>Sur l’écran d’accueil</strong>. Elle s’ouvre alors en plein écran, même hors connexion.</p>
+      </div>
+
+      <div class="help-card">
+        <h2 class="h2">🔐 Confidentialité</h2>
+        <ul class="tips">
+          <li>L’app tourne entièrement dans ton navigateur. Tes exports ne sont envoyés à aucun serveur : ni au créateur de l’app, ni à Instagram.</li>
+          <li>Pas de compte à créer, pas de publicité, pas de mesure d’audience, pas de cookie.</li>
+          <li>Comme pour tout site, l’hébergeur voit seulement ta visite (adresse IP, page demandée), jamais le contenu de tes exports.</li>
+          <li>Pour tout effacer : supprime tes exports dans l’onglet Exports, ou efface les données du site dans les réglages de ton navigateur.</li>
+        </ul>
+      </div>
+
+      <details class="howto">
+        <summary>Pourquoi pas de connexion directe à Instagram ?</summary>
+        <p class="muted">Instagram ne donne pas accès à la liste de tes abonnés aux applications extérieures. Les applis qui demandent ton mot de passe imitent un navigateur, ce qu’Instagram interdit : ton compte risque une vérification ou un blocage. L’export officiel est la seule méthode sans risque.</p>
+      </details>
+    </section>
+  </main>
+
+  <footer class="legal">
+    <p>T’as cru j’étais ton fan&nbsp;? n’est ni affilié, ni soutenu, ni sponsorisé par Instagram ou Meta. Instagram est une marque de Meta Platforms, Inc.</p>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+</div>

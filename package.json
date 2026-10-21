@@ -1,0 +1,16 @@
+{
+  "name": "tas-cru-jetais-ton-fan",
+  "version": "1.0.0",
+  "description": "T’as cru j’étais ton fan ? Qui ne te suit pas en retour sur Instagram, et qui s’est désabonné, à partir des exports officiels.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "dev": "node serve.mjs",
+    "test": "node tests/test.mjs",
+    "icons": "node icons.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

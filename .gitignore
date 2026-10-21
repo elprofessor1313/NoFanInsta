@@ -1,0 +1,4 @@
+node_modules/
+.DS_Store
+# reconstruit par npm run build (et par GitHub Actions pour la mise en ligne)
+dist/

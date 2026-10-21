@@ -1,5 +1,5 @@
 /*
- * Lecture des exports Instagram ("Télécharger vos informations").
+ * Lecture des exports Instagram ("Exporter vos informations").
  *
  * Formats pris en charge :
  *  - ZIP complet ou partiel de l'export (format JSON ou HTML)
@@ -101,6 +101,34 @@
     return Date.UTC((date >> 9) + 1980, ((date >> 5) & 15) - 1, date & 31, time >> 11, (time >> 5) & 63, (time & 31) * 2);
   }
 
+  /*
+   * Les heures du ZIP sont celles des serveurs d'Instagram, en Californie (fuseau du Pacifique),
+   * sans indication de fuseau. Vérifié sur de vrais exports : leurs données contiennent des
+   * abonnements postérieurs à l'heure du ZIP lue en UTC, mais antérieurs à cette heure lue
+   * en heure du Pacifique.
+   */
+  const IG_TZ = 'America/Los_Angeles';
+  let igClock = null;
+
+  /** Heure affichée à cet instant en Californie, sous forme d'heure « naïve » (ms). */
+  function igWallTime(ms) {
+    igClock = igClock || new Intl.DateTimeFormat('en-US', {
+      timeZone: IG_TZ, hourCycle: 'h23',
+      year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit',
+    });
+    const p = {};
+    for (const x of igClock.formatToParts(new Date(ms))) p[x.type] = x.value;
+    return Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour % 24, +p.minute, +p.second);
+  }
+
+  /** stamp (heure naïve des serveurs d'Instagram) → instant réel (ms UTC), ou null. */
+  function stampToInstant(stamp) {
+    if (!stamp) return null;
+    let t = stamp;
+    for (let i = 0; i < 2; i++) t += stamp - igWallTime(t);
+    return t;
+  }
+
   /** Extrait du ZIP les fichiers dont le nom satisfait `wanted` : [{ name, data, time }]. */
   async function unzip(bytes, wanted) {
     const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
@@ -189,7 +217,8 @@
    * Résultat :
    *   { backup }                                   si c'est une sauvegarde de l'app
    *   { followers: Map, following: Map, hasFollowers, hasFollowing, files, date, account, stamp }
-   * stamp : heure de création de l'export lue dans le ZIP (ms, sans fuseau), ou null.
+   * stamp : heure de création de l'export lue dans le ZIP (ms, heure naïve du Pacifique), ou null.
+   *         Sert à ordonner ; pour l'afficher, la convertir avec stampToInstant.
    * Instagram nomme ses archives avec le jour seulement : stamp départage plusieurs exports du même jour.
    */
   async function parseInputs(items) {
@@ -238,5 +267,5 @@
     return { followers, following, hasFollowers, hasFollowing, files, date, account, stamp };
   }
 
-  root.DesabosParser = { parseInputs, unzip, kindOf, hintsFromName, normUser, parseJsonEntries, parseHtml };
+  root.DesabosParser = { parseInputs, unzip, kindOf, hintsFromName, normUser, parseJsonEntries, parseHtml, stampToInstant };
 })(typeof window !== 'undefined' ? window : globalThis);

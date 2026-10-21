@@ -162,6 +162,13 @@ await test('Heure de création lue dans le ZIP (plusieurs exports le même jour)
   assert.equal(r2.stamp, null);
 });
 
+await test('Heure du ZIP (Pacifique) convertie en instant réel', () => {
+  assert.equal(P.stampToInstant(Date.UTC(2026, 9, 21, 15, 7)), Date.UTC(2026, 9, 21, 22, 7)); // heure d'été : UTC−7
+  assert.equal(P.stampToInstant(Date.UTC(2026, 0, 15, 10, 0)), Date.UTC(2026, 0, 15, 18, 0)); // heure d'hiver : UTC−8
+  assert.equal(P.stampToInstant(Date.UTC(2026, 9, 21, 20, 30)), Date.UTC(2026, 9, 22, 3, 30)); // change de jour en UTC
+  assert.equal(P.stampToInstant(null), null);
+});
+
 await test('Exports du même jour rangés par heure de création, puis ordre d’import', () => {
   const day = Date.UTC(2026, 9, 21, 12);
   const metas = [

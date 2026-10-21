@@ -2,7 +2,7 @@
 
 Montre qui ne te suit pas en retour sur Instagram, repère qui s'est désabonné entre deux exports, et met en évidence ceux que tu suis encore.
 
-L'app ne se connecte jamais à Instagram et ne demande aucun mot de passe. Elle lit les exports officiels (« Télécharger vos informations ») et compare deux dates. Tout reste sur l'appareil.
+L'app ne se connecte jamais à Instagram et ne demande aucun mot de passe. Elle lit les exports officiels (« Exporter vos informations ») et compare deux dates. Tout reste sur l'appareil.
 
 ## Ce qu'elle fait
 
@@ -20,10 +20,11 @@ Bon à savoir : Instagram ne date pas les désabonnements. Un départ est repér
 ## Obtenir un export Instagram
 
 1. Instagram → ton profil → menu ☰ → **Espace Comptes**.
-2. **Vos informations et autorisations** → **Télécharger vos informations**.
-3. **Certaines de vos informations** → cocher uniquement **Abonnés et abonnements**.
-4. Format **JSON**, période **Depuis le début**.
-5. Télécharger le .zip quand Instagram prévient, puis l'ajouter dans l'onglet **Exports**.
+2. **Vos informations et autorisations** → **Exporter vos informations**.
+3. **Créer une exportation**, puis sélectionner son **compte Instagram** dans la liste.
+4. **Exporter sur mon appareil**.
+5. Régler l’exportation : l’e-mail sur lequel être averti, **Personnaliser les informations** → uniquement **Followers et suivi(e)s**, **Période** → **Depuis le début**, **Format** → **JSON**, **Qualité des contenus multimédias** → **Qualité inférieure**.
+6. **Commencer l’exportation**, puis télécharger le .zip quand Instagram prévient et l’ajouter dans l’onglet **Exports**.
 
 ## Structure du projet
 

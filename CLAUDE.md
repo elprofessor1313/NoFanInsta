@@ -1,6 +1,6 @@
 # T’as cru j’étais ton fan ? — notes pour Claude Code
 
-App web (PWA) d'audit des abonnés Instagram, pensée d'abord pour iPhone. Elle lit les exports officiels d'Instagram (« Télécharger vos informations », format JSON ou HTML, en .zip ou fichiers séparés), enregistre chaque export comme un instantané daté, et compare deux instantanés : départs (abonnés perdus), arrivées, comptes sans retour. Les départs que l'utilisateur suit encore sont mis en évidence.
+App web (PWA) d'audit des abonnés Instagram, pensée d'abord pour iPhone. Elle lit les exports officiels d'Instagram (« Exporter vos informations », format JSON ou HTML, en .zip ou fichiers séparés), enregistre chaque export comme un instantané daté, et compare deux instantanés : départs (abonnés perdus), arrivées, comptes sans retour. Les départs que l'utilisateur suit encore sont mis en évidence.
 
 Règles importantes :
 - Jamais de connexion à Instagram, d'identifiants ou de scraping : uniquement les exports officiels.

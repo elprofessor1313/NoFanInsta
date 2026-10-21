@@ -16,6 +16,7 @@
   const fmtDayNoYear = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short' });
   const fmtMonth = new Intl.DateTimeFormat('fr-FR', { month: 'long', year: 'numeric' });
   const fmtSelect = new Intl.DateTimeFormat('fr-FR', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+  const fmtTime = new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit' });
 
   const EYE_OFF_SVG = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 8s2.4-4.5 6.5-4.5S14.5 8 14.5 8s-2.4 4.5-6.5 4.5S1.5 8 1.5 8z"/><circle cx="8" cy="8" r="2"/><path d="M2.5 2.5l11 11"/></svg>';
   const GHOST_SVG = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M3 14.2V7.2a5 5 0 0 1 10 0v7L11.3 13l-1.6 1.2L8 13l-1.7 1.2L4.7 13z"/><circle cx="6.2" cy="7.4" r="1" fill="currentColor" stroke="none"/><circle cx="9.8" cy="7.4" r="1" fill="currentColor" stroke="none"/></svg>';
@@ -72,6 +73,15 @@
     const same = state.metas.filter((x) => isoDay(x.takenAt) === day);
     const label = (fmt || fmtDay).format(new Date(m.takenAt));
     return same.length > 1 ? `${label} · n°${same.indexOf(m) + 1}` : label;
+  }
+
+  // Date et heure d'un export pour « Mes exports » : heure de création (fuseau de l'appareil) si connue
+  function snapDateTime(m) {
+    const at = P.stampToInstant(m.stamp);
+    if (!at) return [snapLabel(m, fmtSelect)];
+    let time = `· ${fmtTime.format(new Date(at))}`;
+    if (isoDay(at) !== isoDay(m.takenAt)) time += ` le ${dateLabel(at)}`;
+    return [fmtSelect.format(new Date(m.takenAt)) + ' ', el('span', { class: 'snap-time', text: time })];
   }
 
   function msFromIso(iso) {
@@ -492,7 +502,7 @@
       }
       list.append(el('li', { class: 'snap' }, [
         el('div', {}, [
-          el('div', { class: 'snap-date', text: snapLabel(m, fmtSelect) }),
+          el('div', { class: 'snap-date' }, snapDateTime(m)),
           el('div', { class: 'snap-meta', text: meta }),
         ]),
         actions,

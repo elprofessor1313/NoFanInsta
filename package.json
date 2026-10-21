@@ -8,6 +8,7 @@
     "build": "node build.mjs",
     "dev": "node serve.mjs",
     "test": "node tests/test.mjs",
+    "test:e2e": "node tests/e2e.mjs",
     "icons": "node icons.mjs"
   },
   "engines": {

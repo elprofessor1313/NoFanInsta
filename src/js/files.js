@@ -1,5 +1,5 @@
 /*
- * Enregistrer un fichier (CSV, sauvegarde) sur l'appareil.
+ * Fichiers produits par l'app : mise en forme CSV, et enregistrement sur l'appareil (CSV, sauvegarde).
  *  - page Claude : capacité "downloads" (le visiteur confirme)
  *  - app installée / navigateur : partage iOS ou téléchargement classique
  */
@@ -22,7 +22,19 @@
   const isIOS = () => /iPhone|iPad|iPod/.test(navigator.userAgent) ||
     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
-  /** Renvoie "saved", "cancelled" ou "failed". */
+  /**
+   * Texte CSV (séparateur virgule, BOM pour qu'Excel lise les accents).
+   * rows : tableaux de valeurs ; la première ligne sert d'en-tête.
+   */
+  function csv(rows) {
+    const cell = (v) => {
+      const s = String(v === null || v === undefined ? '' : v);
+      return /[",\n;]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+    };
+    return '﻿' + rows.map((r) => r.map(cell).join(',')).join('\n');
+  }
+
+  /** Renvoie "saved", "cancelled", "busy" (un enregistrement est déjà en cours) ou "failed". */
   async function saveFile(filename, text, mime) {
     const blob = new Blob([text], { type: mime });
     const d = await downloads();
@@ -61,5 +73,5 @@
     }
   }
 
-  root.DesabosFiles = { saveFile, isIOS };
+  root.DesabosFiles = { csv, saveFile, isIOS };
 })(typeof window !== 'undefined' ? window : globalThis);

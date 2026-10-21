@@ -121,7 +121,6 @@ code { font-family: var(--f-mono); font-size: .86em; background: var(--accent-so
 .btn:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--edge); }
 .btn:disabled { opacity: .45; cursor: default; transform: none; box-shadow: 3px 3px 0 var(--edge); }
 .btn-primary { background: var(--accent); color: var(--accent-ink); }
-.btn-ghost { background: var(--surface); }
 .btn-block { width: 100%; }
 .btn-small { min-height: 34px; padding: 0 12px; font-size: 14px; border-radius: 10px; box-shadow: 2px 2px 0 var(--edge); }
 .btn-small:active { transform: translate(2px, 2px); }
@@ -195,8 +194,10 @@ select {
 }
 .seg {
   border: 0; background: transparent; border-radius: 13px; padding: 8px 4px; cursor: pointer;
-  font-weight: 700; font-size: 14px; color: var(--muted); display: flex; justify-content: center; align-items: center; gap: 5px; flex-wrap: wrap;
+  font-weight: 700; font-size: 14px; color: var(--muted);
+  display: flex; flex-direction: column; align-items: center; gap: 4px; /* libellé, puis compteur dessous */
 }
+.seg-label { white-space: nowrap; }
 .seg[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); }
 .seg-n {
   font-variant-numeric: tabular-nums; font-weight: 700; font-size: 12px;
@@ -263,33 +264,23 @@ select {
   font-size: 13px; font-weight: 700; color: var(--ink); text-decoration: none; display: inline-flex; align-items: center;
 }
 .open:active { background: var(--pop); color: var(--pop-ink); }
-.done-btn {
+/* Bouton rond à icône (actions de la Fan Zone, légende de l'Aide) */
+.icon-btn {
   width: 34px; height: 34px; border-radius: 50%; border: var(--bw) solid var(--edge); background: var(--surface);
-  cursor: pointer; display: grid; place-items: center; color: var(--muted);
+  cursor: pointer; display: grid; place-items: center; color: var(--muted); font-size: 15px;
 }
-.done-btn svg, .excl-btn svg, .ghost-btn svg { width: 17px; height: 17px; }
-.excl-btn, .ghost-btn {
-  width: 34px; height: 34px; border-radius: 50%; border: var(--bw) solid var(--edge); background: var(--surface);
-  cursor: pointer; display: grid; place-items: center; color: var(--muted);
-}
-.excl-btn[aria-pressed="true"] { background: var(--pop); color: var(--pop-ink); }
-.ghost-btn[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
+.icon-btn svg { width: 17px; height: 17px; }
+.icon-btn[data-action="ghost"][aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
+.icon-btn[data-action="exclude"][aria-pressed="true"] { background: var(--pop); color: var(--pop-ink); }
+.icon-btn[data-action="done"][aria-pressed="true"] { background: var(--ok); color: var(--surface); }
 /* Icône dans une phrase ou un filtre (œil barré, fantôme) */
 .inline-ico { display: inline-flex; vertical-align: -.2em; }
 .inline-ico svg { width: 1.15em; height: 1.15em; }
 .chip .inline-ico { vertical-align: -.22em; }
 .badge.excl { background: var(--pop); color: var(--pop-ink); }
 .badge.ghost { background: var(--accent-soft); color: var(--ink); }
-@media (max-width: 559px) {
-  .row.is-stacked { grid-template-columns: 40px minmax(0, 1fr); row-gap: 8px; }
-  .row.is-stacked .avatar { grid-row: span 2; align-self: start; }
-  .row.is-stacked .row-actions { grid-column: 2; }
-}
-.done-btn[aria-pressed="true"] { background: var(--ok); color: var(--surface); }
-.row.is-done { background: transparent; }
 .row.is-done .avatar { opacity: .5; }
 .row.is-done .handle { color: var(--muted); text-decoration: line-through; text-decoration-thickness: 1.5px; }
-.row.is-done .badge { background: var(--ok-soft); color: var(--ok); }
 
 .empty {
   margin: 0; padding: 24px 16px; text-align: center; color: var(--muted); font-weight: 600;
@@ -337,7 +328,6 @@ select {
 
 .howto { background: var(--surface); border: var(--bw) solid var(--edge); border-radius: var(--r); padding: 0 16px; }
 .howto summary { cursor: pointer; padding: 14px 0; font-weight: 700; list-style-position: inside; }
-.howto ol { margin: 0 0 12px; padding-left: 20px; display: grid; gap: 6px; font-size: 14px; }
 .howto > p { padding-bottom: 16px; }
 
 /* ---------- Aide ---------- */
@@ -379,10 +369,6 @@ select {
 .legend { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; font-size: 14px; }
 .legend li { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 10px; align-items: center; }
 .legend li > :first-child { justify-self: center; cursor: default; }
-.chip-sample {
-  width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
-  border: var(--bw) solid var(--edge); background: var(--surface); font-size: 15px;
-}
 .tips { margin: 0; padding-left: 20px; display: grid; gap: 8px; font-size: 14px; }
 
 /* ---------- Pied de page ---------- */
@@ -402,16 +388,26 @@ select {
   border: var(--bw) solid var(--edge); box-shadow: 3px 3px 0 var(--pop);
 }
 
-@media (min-width: 560px) {
-  .toolbar { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
-  .big { font-size: 88px; }
-  .brand-name { font-size: 18px; }
-}
+/* ---------- Tailles d'écran ---------- */
 /* Écran étroit : les onglets passent sous le nom, sur toute la largeur */
 @media (max-width: 539px) {
   .top-inner { gap: 8px; }
   .views { flex: 1 1 100%; }
   .view-tab { flex: 1; justify-content: center; }
+}
+/* Lignes à 3 actions : les boutons passent sous le pseudo */
+@media (max-width: 559px) {
+  .row.is-stacked { grid-template-columns: 40px minmax(0, 1fr); row-gap: 8px; }
+  .row.is-stacked .avatar { grid-row: span 2; align-self: start; }
+  .row.is-stacked .row-actions { grid-column: 2; }
+}
+@media (max-width: 380px) {
+  .seg { font-size: 13px; }
+}
+@media (min-width: 560px) {
+  .toolbar { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+  .big { font-size: 88px; }
+  .brand-name { font-size: 18px; }
 }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }

@@ -46,9 +46,9 @@
       <div class="headline" id="headline"></div>
 
       <div class="segments" id="segments" role="tablist" aria-label="Listes">
-        <button type="button" role="tab" class="seg" data-seg="lost" aria-selected="true"><span aria-hidden="true">🧐</span> Départs <span class="seg-n" id="n-lost">0</span></button>
-        <button type="button" role="tab" class="seg" data-seg="gained" aria-selected="false"><span aria-hidden="true">🎉</span> Arrivées <span class="seg-n" id="n-gained">0</span></button>
-        <button type="button" role="tab" class="seg" data-seg="noBack" aria-selected="false"><span aria-hidden="true">🙄</span> Fan Zone <span class="seg-n" id="n-noBack">0</span></button>
+        <button type="button" role="tab" class="seg" data-seg="lost" aria-selected="true"><span class="seg-label"><span aria-hidden="true">🧐</span> Départs</span> <span class="seg-n" id="n-lost">0</span></button>
+        <button type="button" role="tab" class="seg" data-seg="gained" aria-selected="false"><span class="seg-label"><span aria-hidden="true">🎉</span> Arrivées</span> <span class="seg-n" id="n-gained">0</span></button>
+        <button type="button" role="tab" class="seg" data-seg="noBack" aria-selected="false"><span class="seg-label"><span aria-hidden="true">🙄</span> Fan Zone</span> <span class="seg-n" id="n-noBack">0</span></button>
       </div>
 
       <div class="toolbar">
@@ -63,8 +63,8 @@
         </label>
         <div class="nb-views" id="noback-views" role="group" aria-label="Afficher" hidden>
           <button type="button" class="chip" data-nbv="list" aria-pressed="true">Liste</button>
-          <button type="button" class="chip" data-nbv="excluded" aria-pressed="false"><span class="inline-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 8s2.4-4.5 6.5-4.5S14.5 8 14.5 8s-2.4 4.5-6.5 4.5S1.5 8 1.5 8z"/><circle cx="8" cy="8" r="2"/><path d="M2.5 2.5l11 11"/></svg></span> Exclus <span class="chip-n" id="n-excluded">0</span></button>
-          <button type="button" class="chip" data-nbv="ghosts" aria-pressed="false"><span class="inline-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M3 14.2V7.2a5 5 0 0 1 10 0v7L11.3 13l-1.6 1.2L8 13l-1.7 1.2L4.7 13z"/><circle cx="6.2" cy="7.4" r="1" fill="currentColor" stroke="none"/><circle cx="9.8" cy="7.4" r="1" fill="currentColor" stroke="none"/></svg></span> Fantômes <span class="chip-n" id="n-ghosts">0</span></button>
+          <button type="button" class="chip" data-nbv="excluded" aria-pressed="false"><span class="inline-ico" data-icon="eyeOff"></span> Exclus <span class="chip-n" id="n-excluded">0</span></button>
+          <button type="button" class="chip" data-nbv="ghosts" aria-pressed="false"><span class="inline-ico" data-icon="ghost"></span> Fantômes <span class="chip-n" id="n-ghosts">0</span></button>
         </div>
       </div>
 
@@ -73,7 +73,7 @@
       <p class="empty" id="list-empty" hidden></p>
 
       <div class="list-foot">
-        <button type="button" id="export-csv" class="btn btn-ghost">Exporter cette liste (CSV)</button>
+        <button type="button" id="export-csv" class="btn">Exporter cette liste (CSV)</button>
       </div>
     </section>
 
@@ -101,7 +101,7 @@
         <p class="field-help">Le jour où tu as demandé l'export à Instagram. C'est cette date qui sert pour les périodes.</p>
         <ul class="warnings" id="draft-warnings"></ul>
         <div class="draft-actions">
-          <button type="button" class="btn btn-ghost" id="draft-cancel">Annuler</button>
+          <button type="button" class="btn" id="draft-cancel">Annuler</button>
           <button type="button" class="btn btn-primary" id="draft-save">Enregistrer l'export</button>
         </div>
       </div>
@@ -124,8 +124,8 @@
         <h2 class="h2">💾 Sauvegarde</h2>
         <p class="muted" id="store-note"></p>
         <div class="backup-actions">
-          <button type="button" class="btn btn-ghost" id="backup-export">Exporter une sauvegarde</button>
-          <label for="file-input" class="btn btn-ghost">Restaurer</label>
+          <button type="button" class="btn" id="backup-export">Exporter une sauvegarde</button>
+          <label for="file-input" class="btn">Restaurer</label>
         </div>
       </div>
     </section>
@@ -187,10 +187,10 @@
         <h2 class="h2">Les boutons de «&nbsp;Fan Zone&nbsp;»</h2>
         <ul class="legend">
           <li><span class="open">Ouvrir</span><span>Ouvre le profil dans Instagram, pour te désabonner si tu veux.</span></li>
-          <li><span class="excl-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 8s2.4-4.5 6.5-4.5S14.5 8 14.5 8s-2.4 4.5-6.5 4.5S1.5 8 1.5 8z"/><circle cx="8" cy="8" r="2"/><path d="M2.5 2.5l11 11"/></svg></span><span><strong>Exclure.</strong> Une star, un artiste, une marque ? C’est normal qu’ils ne te suivent pas : l’œil barré les retire de «&nbsp;Fan Zone&nbsp;», pour cette analyse et les suivantes. Retrouve-les avec le filtre <strong>Exclus</strong>.</span></li>
-          <li><span class="ghost-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M3 14.2V7.2a5 5 0 0 1 10 0v7L11.3 13l-1.6 1.2L8 13l-1.7 1.2L4.7 13z"/><circle cx="6.2" cy="7.4" r="1" fill="currentColor" stroke="none"/><circle cx="9.8" cy="7.4" r="1" fill="currentColor" stroke="none"/></svg></span><span><strong>Fantôme.</strong> Un compte introuvable sur Instagram (désactivé, supprimé, faux compte banni) ? Il traîne encore dans ton export : le fantôme le retire de toutes les listes. Retrouve-les avec le filtre <strong>Fantômes</strong>.</span></li>
-          <li><span class="done-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg></span><span><strong>Traité.</strong> Coche un compte une fois réglé (désabonné, relancé…), pour t’y retrouver.</span></li>
-          <li><span class="chip-sample">🔎</span><span>Cherche un pseudo, ou exporte la liste affichée en <strong>CSV</strong> (bas de page).</span></li>
+          <li><span class="icon-btn" data-icon="eyeOff"></span><span><strong>Exclure.</strong> Une star, un artiste, une marque ? C’est normal qu’ils ne te suivent pas : l’œil barré les retire de «&nbsp;Fan Zone&nbsp;», pour cette analyse et les suivantes. Retrouve-les avec le filtre <strong>Exclus</strong>.</span></li>
+          <li><span class="icon-btn" data-icon="ghost"></span><span><strong>Fantôme.</strong> Un compte introuvable sur Instagram (désactivé, supprimé, faux compte banni) ? Il traîne encore dans ton export : le fantôme le retire de toutes les listes. Retrouve-les avec le filtre <strong>Fantômes</strong>.</span></li>
+          <li><span class="icon-btn" data-icon="check"></span><span><strong>Traité.</strong> Coche un compte une fois réglé (désabonné, relancé…), pour t’y retrouver.</span></li>
+          <li><span class="icon-btn">🔎</span><span>Cherche un pseudo, ou exporte la liste affichée en <strong>CSV</strong> (bas de page).</span></li>
         </ul>
       </div>
 

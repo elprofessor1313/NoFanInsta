@@ -1,60 +1,28 @@
-// Tests de la lecture des exports et de la comparaison.  node tests/test.mjs
+// Tests de la logique (sans navigateur) : lecture des exports, comparaison, stockage, mise en forme.
+//   node tests/test.mjs
+// Fuseau fixe : les dates affichées dépendent du fuseau de l'appareil.
+process.env.TZ = 'Europe/Paris';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { deflateRawSync } from 'node:zlib';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
+import { makeZip, dos } from './zip.mjs';
 
 const SRC = join(dirname(fileURLToPath(import.meta.url)), '..', 'src', 'js');
-for (const f of ['parser.js', 'compare.js', 'storage.js']) {
+for (const f of ['parser.js', 'compare.js', 'storage.js', 'format.js', 'files.js']) {
   vm.runInThisContext(readFileSync(join(SRC, f), 'utf8'), { filename: f });
 }
 const P = globalThis.DesabosParser;
 const C = globalThis.DesabosCompare;
 const S = globalThis.DesabosStorage;
+const F = globalThis.DesabosFormat;
+const Files = globalThis.DesabosFiles;
 
 let passed = 0;
 async function test(name, fn) {
   try { await fn(); passed++; console.log('  ✓ ' + name); }
   catch (e) { console.error('  ✗ ' + name + '\n    ' + (e.stack || e)); process.exitCode = 1; }
-}
-
-// --- Fabrique d'un petit ZIP (méthodes "stored" et "deflate") ---
-function crc32(buf) {
-  let c, crc = 0xffffffff;
-  for (let n = 0; n < buf.length; n++) {
-    c = (crc ^ buf[n]) & 0xff;
-    for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
-    crc = (crc >>> 8) ^ c;
-  }
-  return (crc ^ 0xffffffff) >>> 0;
-}
-function makeZip(files) {
-  const locals = []; const centrals = []; let offset = 0;
-  for (const [name, text, deflate, dos = [0, 0]] of files) {
-    const nameBuf = Buffer.from(name);
-    const raw = Buffer.from(text);
-    const data = deflate ? deflateRawSync(raw) : raw;
-    const lh = Buffer.alloc(30);
-    lh.writeUInt32LE(0x04034b50, 0); lh.writeUInt16LE(20, 4); lh.writeUInt16LE(deflate ? 8 : 0, 8);
-    lh.writeUInt32LE(crc32(raw), 14); lh.writeUInt32LE(data.length, 18); lh.writeUInt32LE(raw.length, 22);
-    lh.writeUInt16LE(dos[1], 10); lh.writeUInt16LE(dos[0], 12);
-    lh.writeUInt16LE(nameBuf.length, 26);
-    locals.push(lh, nameBuf, data);
-    const ch = Buffer.alloc(46);
-    ch.writeUInt32LE(0x02014b50, 0); ch.writeUInt16LE(20, 4); ch.writeUInt16LE(20, 6); ch.writeUInt16LE(deflate ? 8 : 0, 10);
-    ch.writeUInt32LE(crc32(raw), 16); ch.writeUInt32LE(data.length, 20); ch.writeUInt32LE(raw.length, 24);
-    ch.writeUInt16LE(dos[1], 12); ch.writeUInt16LE(dos[0], 14);
-    ch.writeUInt16LE(nameBuf.length, 28); ch.writeUInt32LE(offset, 42);
-    centrals.push(ch, nameBuf);
-    offset += 30 + nameBuf.length + data.length;
-  }
-  const cd = Buffer.concat(centrals);
-  const end = Buffer.alloc(22);
-  end.writeUInt32LE(0x06054b50, 0); end.writeUInt16LE(files.length, 8); end.writeUInt16LE(files.length, 10);
-  end.writeUInt32LE(cd.length, 12); end.writeUInt32LE(offset, 16);
-  return new Uint8Array(Buffer.concat([...locals, cd, end]));
 }
 
 // Ancien format : le pseudo est dans "value"
@@ -147,8 +115,6 @@ await test('Exclusions de la Fan Zone', () => {
   assert.deepEqual(C.splitExcluded(d.noBack, undefined).kept.length, 2);
 });
 
-// date et heure au format DOS : [date, heure]
-const dos = (y, mo, d, h, mi) => [((y - 1980) << 9) | (mo << 5) | d, (h << 11) | (mi << 5)];
 
 await test('Heure de création lue dans le ZIP (plusieurs exports le même jour)', async () => {
   const zip = (h, mi) => makeZip([
@@ -183,6 +149,28 @@ await test('Exports du même jour rangés par heure de création, puis ordre d�
   assert.deepEqual(noStamp.map((m) => m.id), ['x', 'y']);
 });
 
+await test('Période d’un seul export : seulement la Fan Zone', () => {
+  const r = C.compareRange(snapB, snapB);
+  assert.deepEqual([r.lost, r.gained], [[], []]);
+  assert.deepEqual(r.noBack.map((x) => x.u), ['jules.vrn', 'studio.ocre']);
+  assert.equal(C.compareRange(null, snapB).noBack.length, 2);
+  assert.equal(C.compareRange(snapA, snapB).lost.length, 3);
+});
+
+await test('Fantômes masqués partout, exclus masqués de la Fan Zone seulement', () => {
+  const base = C.compareRange(snapA, snapB);
+  const r = C.applyUserLists(base, { ghosts: { 'jules.vrn': 1, 'disparu.compte': 2 }, excluded: { 'studio.ocre': 3 } });
+  assert.deepEqual(r.lost.map((x) => x.u), ['atelier_sud', 'nina_kv']); // jules.vrn (fantôme) retiré des départs
+  assert.equal(r.stillCount, 0);                                        // recalculé sans le fantôme
+  assert.deepEqual(r.noBack, []);
+  assert.deepEqual(r.noBackExcluded.map((x) => x.u), ['studio.ocre']);
+  assert.equal(r.noBackGhosts, 1);
+  assert.deepEqual(r.ghostRows.map((x) => x.u), ['disparu.compte', 'jules.vrn']);
+  const none = C.applyUserLists(base, {});
+  assert.equal(none.lost.length, 3);
+  assert.equal(none.stillCount, 1);
+});
+
 await test('Choix de la période', () => {
   const metas = [0, 10, 20, 50].map((d, i) => ({ id: 'm' + i, takenAt: Date.UTC(2026, 0, 1) + d * day }));
   assert.deepEqual(C.pickRange(metas, 'last'), { from: 'm2', to: 'm3', exact: true });
@@ -203,6 +191,45 @@ await test('Réglages fusionnés (appareil + compte Claude)', () => {
   const m = S.mergeSettings({ done: { a: 1 }, excluded: { star: 1 }, ghosts: { faux: 3 } }, { excluded: { chanteur: 2 } });
   assert.deepEqual(m, { done: { a: 1 }, excluded: { star: 1, chanteur: 2 }, ghosts: { faux: 3 } });
   assert.deepEqual(S.mergeSettings({}, undefined), { done: {}, excluded: {}, ghosts: {} });
+});
+
+console.log('Mise en forme');
+
+await test('Nombres, pluriels et jours', () => {
+  assert.equal(F.count(1, 'départ', 'départs'), '1 départ');
+  assert.equal(F.count(1234, 'départ', 'départs'), '1\u202f234 départs');
+  assert.equal(F.isoDay(F.msFromIso('2026-10-21')), '2026-10-21');
+  assert.equal(F.sinceLabel(0), '');
+  assert.ok(F.avatarTone('jules.vrn') >= 1 && F.avatarTone('jules.vrn') <= 6);
+});
+
+await test('Texte de la période (avec l’heure le même jour)', () => {
+  const now = Date.UTC(2026, 9, 22);
+  const snap = (iso, stamp) => ({ takenAt: F.msFromIso(iso), stamp });
+  assert.equal(F.periodText(snap('2026-09-18'), snap('2026-10-22'), now), 'Entre le 18 sept. et le 22 oct. 2026');
+  // heures du ZIP en heure du Pacifique → heure de Paris (+9 h en octobre)
+  assert.equal(F.periodText(snap('2026-10-21', Date.UTC(2026, 9, 21, 14, 47)), snap('2026-10-21', Date.UTC(2026, 9, 21, 15, 7)), now),
+    'Entre le 21 oct. à 23:47 et le 22 oct. 2026 à 00:07');
+  assert.equal(F.periodText(snap('2026-10-21'), snap('2026-10-21'), now), 'Entre deux exports du 21 oct. 2026');
+});
+
+await test('Libellés des exports : n°1, n°2 le même jour, heure de création', () => {
+  const now = Date.UTC(2026, 9, 22);
+  const a = { takenAt: F.msFromIso('2026-10-21'), stamp: Date.UTC(2026, 9, 21, 13, 55) };
+  const b = { takenAt: F.msFromIso('2026-10-21'), stamp: Date.UTC(2026, 9, 21, 15, 7) };
+  const c = { takenAt: F.msFromIso('2026-09-18'), stamp: null };
+  const metas = [c, a, b];
+  assert.equal(F.snapLabel(a, metas), '21 oct. 2026 · n°1');
+  assert.equal(F.snapLabel(b, metas), '21 oct. 2026 · n°2');
+  assert.equal(F.snapLabel(c, metas), '18 sept. 2026');
+  assert.deepEqual(F.snapDateTime(a, metas, now), { date: 'mer. 21 oct. 2026', time: '· 22:55' });
+  assert.deepEqual(F.snapDateTime(b, metas, now), { date: 'mer. 21 oct. 2026', time: '· 00:07 le 22 oct.' });
+  assert.deepEqual(F.snapDateTime(c, metas, now), { date: 'ven. 18 sept. 2026', time: null });
+});
+
+await test('CSV : guillemets, virgules et BOM', () => {
+  const text = Files.csv([['compte', 'statut'], ['a.b', 'parti, tu le suis encore'], ['c"d', '']]);
+  assert.equal(text, '\ufeffcompte,statut\na.b,"parti, tu le suis encore"\n"c""d",');
 });
 
 console.log(`\n${passed} tests réussis.`);

@@ -21,7 +21,7 @@
     const takenAt = now.getTime() - daysAgo * 86400000;
     const ts = (i) => Math.floor((takenAt - (400 - i * 7) * 86400000) / 1000);
     return {
-      id, takenAt, account: 'exemple', demo: true,
+      id, takenAt, account: 'exemple',
       followers: followers.map((i) => [NAMES[i], ts(i)]),
       following: following.map((i) => [NAMES[i], ts(i) + 3600]),
     };

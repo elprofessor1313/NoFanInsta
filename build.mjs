@@ -20,7 +20,9 @@ const DIST = join(ROOT, 'dist');
 const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8'));
 
 // L'ordre compte : chaque fichier s'appuie sur les précédents.
-const SCRIPTS = ['parser.js', 'compare.js', 'storage.js', 'files.js', 'demo.js', 'app.js'];
+//   logique (sans DOM, testée) : parser, compare, storage, format, files, demo
+//   interface                  : dom, audit (onglet Résultats), exports (onglet Exports), app (démarrage)
+const SCRIPTS = ['parser.js', 'compare.js', 'storage.js', 'format.js', 'files.js', 'demo.js', 'dom.js', 'audit.js', 'exports.js', 'app.js'];
 
 const APP_NAME = 'T’as cru j’étais ton fan ?';
 const SHORT_NAME = 'T’as cru ?'; // nom sous l'icône de l'écran d'accueil (12 caractères au plus)
@@ -37,7 +39,7 @@ export function build({ quiet = false } = {}) {
   const js = SCRIPTS.map((f) => `/* ${f} */\n` + read(join('js', f))).join('\n');
   const fontsCss = read(join('fonts', 'fonts.css'));
   const fontFiles = readdirSync(join(SRC, 'fonts')).filter((f) => f.endsWith('.woff2'));
-  const version = pkg.version + '-' + createHash('sha256').update(css + body + js + fontsCss + read('sw.js')).digest('hex').slice(0, 8);
+  const version = pkg.version + '-' + createHash('sha256').update(css + body + js + fontsCss + read('sw.js') + read('sw-register.js')).digest('hex').slice(0, 8);
 
   const head = (fonts) => [
     `<title>${APP_NAME}</title>`,
@@ -78,22 +80,7 @@ export function build({ quiet = false } = {}) {
     `<meta name="theme-color" media="(prefers-color-scheme: light)" content="${THEME_LIGHT}">`,
     `<meta name="theme-color" media="(prefers-color-scheme: dark)" content="${THEME_DARK}">`,
   ].join('\n');
-  const swRegister = inlineScript(
-    "if ('serviceWorker' in navigator && location.protocol !== 'file:') {\n" +
-    // Nouvelle version installée → recharger la page (pas au tout premier chargement)
-    "  const hadController = !!navigator.serviceWorker.controller;\n" +
-    "  let reloading = false;\n" +
-    "  navigator.serviceWorker.addEventListener('controllerchange', () => {\n" +
-    "    if (hadController && !reloading) { reloading = true; location.reload(); }\n" +
-    "  });\n" +
-    "  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').then((reg) => {\n" +
-    // Sur iPhone, l'app installée reprend sans se recharger : chercher une mise à jour à chaque retour
-    "    document.addEventListener('visibilitychange', () => {\n" +
-    "      if (document.visibilityState === 'visible') reg.update().catch(() => {});\n" +
-    "    });\n" +
-    "  }).catch(() => {}));\n" +
-    '}'
-  );
+  const swRegister = inlineScript(read('sw-register.js'));
   const web = `<!doctype html>\n<html lang="fr" class="pwa">\n<head>\n${pwaHead}\n${head(localFonts)}\n</head>\n<body>\n${body}\n${scripts}\n${swRegister}\n</body>\n</html>\n`;
   writeFileSync(join(DIST, 'web', 'index.html'), web);
 

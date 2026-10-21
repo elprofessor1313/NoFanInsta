@@ -62,6 +62,43 @@
   }
 
   /**
+   * Comparaison d'une période. Un seul instantané (older absent ou identique) :
+   * pas de départs ni d'arrivées, seulement la Fan Zone.
+   */
+  function compareRange(older, newer) {
+    if (!older || older.id === newer.id) {
+      return { lost: [], gained: [], noBack: notFollowingBack(newer), stillCount: 0, hasFollowing: newer.following.length > 0 };
+    }
+    return diff(older, newer);
+  }
+
+  /**
+   * Applique les listes tenues par l'utilisateur ({ pseudo: date }) à un résultat de compareRange :
+   *  - ghosts   (comptes introuvables) : masqués de toutes les listes ;
+   *  - excluded (stars, marques…)      : masqués de la Fan Zone seulement.
+   * Renvoie les listes affichées, plus de quoi consulter les comptes masqués :
+   * noBackExcluded (exclus de la Fan Zone), noBackGhosts (nombre de fantômes masqués de la Fan Zone),
+   * ghostRows (tous les fantômes).
+   */
+  function applyUserLists(res, lists) {
+    const ghosts = (lists && lists.ghosts) || {};
+    const excluded = (lists && lists.excluded) || {};
+    const lost = splitExcluded(res.lost, ghosts).kept;
+    const noBack = splitExcluded(res.noBack, ghosts);
+    const fanZone = splitExcluded(noBack.kept, excluded);
+    return {
+      lost,
+      gained: splitExcluded(res.gained, ghosts).kept,
+      noBack: fanZone.kept,
+      noBackExcluded: fanZone.hidden,
+      noBackGhosts: noBack.hidden.length,
+      ghostRows: Object.keys(ghosts).sort().map((u) => ({ u, since: 0 })),
+      stillCount: lost.filter((r) => r.stillFollowing).length,
+      hasFollowing: res.hasFollowing,
+    };
+  }
+
+  /**
    * Ordre chronologique des instantanés : jour de l'export, puis heure de création
    * lue dans le ZIP (plusieurs exports le même jour), puis ordre d'import.
    */
@@ -96,5 +133,5 @@
     return Math.round(Math.abs(b - a) / DAY);
   }
 
-  root.DesabosCompare = { diff, notFollowingBack, splitExcluded, snapOrder, pickRange, daysBetween, DAY };
+  root.DesabosCompare = { diff, notFollowingBack, compareRange, splitExcluded, applyUserLists, snapOrder, pickRange, daysBetween, DAY };
 })(typeof window !== 'undefined' ? window : globalThis);

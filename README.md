@@ -30,20 +30,26 @@ Bon à savoir : Instagram ne date pas les désabonnements. Un départ est repér
 
 ```
 src/
-  body.html        structure de la page
-  style.css        apparence (couleurs, polices, mise en page)
-  js/parser.js     lecture des exports (ZIP, JSON, HTML) — sans bibliothèque
-  js/compare.js    calcul des départs, arrivées, Fan Zone, périodes
-  js/storage.js    enregistrement (navigateur, ou compte Claude dans la version Claude)
-  js/files.js      enregistrement des fichiers CSV / sauvegarde
-  js/demo.js       données d'exemple affichées au premier lancement
-  js/app.js        interface
-  sw.js            fonctionnement hors connexion
-  icons/           icônes de l'app
-build.mjs          construit dist/
-icons.mjs          génère les icônes PNG (emoji 😎, police libre Noto Color Emoji)
-serve.mjs          serveur local de développement
-tests/test.mjs     tests de la lecture et de la comparaison
+  body.html          structure de la page
+  style.css          apparence (couleurs, polices, mise en page)
+  js/parser.js       lecture des exports (ZIP, JSON, HTML) — sans bibliothèque
+  js/compare.js      règles : départs, arrivées, Fan Zone, fantômes, exclus, périodes
+  js/storage.js      enregistrement (navigateur, ou compte Claude dans la version Claude)
+  js/format.js       mise en forme des nombres, dates et périodes
+  js/files.js        fichiers CSV et sauvegarde
+  js/demo.js         données d'exemple affichées au premier lancement
+  js/dom.js          outils d'interface et icônes
+  js/audit.js        onglet Résultats
+  js/exports.js      onglet Exports
+  js/app.js          démarrage, état, navigation
+  sw.js, sw-register.js   fonctionnement hors connexion et mises à jour
+  fonts/, icons/     polices (licence OFL) et icônes de l'app
+build.mjs            construit dist/
+icons.mjs            génère les icônes PNG (emoji 😎, police libre Noto Color Emoji)
+serve.mjs            serveur local de développement
+tools/chrome.mjs     pilotage de Chrome pour les icônes et le test d'interface
+tests/test.mjs       tests de la logique
+tests/e2e.mjs        test de l'interface dans un vrai navigateur
 ```
 
 Aucune dépendance. Il faut seulement **Node.js 18 ou plus** (https://nodejs.org).
@@ -53,7 +59,8 @@ Aucune dépendance. Il faut seulement **Node.js 18 ou plus** (https://nodejs.org
 ```bash
 npm run dev     # http://localhost:5173 — reconstruit à chaque rechargement
 npm run build   # produit dist/
-npm test        # vérifie la lecture des exports et les calculs
+npm test        # vérifie la logique (lecture des exports, calculs, mise en forme)
+npm run test:e2e  # vérifie l'interface dans Chrome ou Edge (Node 22+)
 npm run icons   # régénère src/icons/ (Node 22+, Chrome ou Edge, connexion internet)
 ```
 

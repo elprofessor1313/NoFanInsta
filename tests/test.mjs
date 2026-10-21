@@ -139,7 +139,7 @@ await test('Départs, ceux suivis encore en premier', () => {
   assert.deepEqual(d.noBack.map((x) => x.u), ['jules.vrn', 'studio.ocre']);
 });
 
-await test('Exclusions de la liste sans retour', () => {
+await test('Exclusions de la Fan Zone', () => {
   const d = C.diff(snapA, snapB);
   const { kept, hidden } = C.splitExcluded(d.noBack, { 'studio.ocre': 1, 'compte.absent': 2 });
   assert.deepEqual(kept.map((x) => x.u), ['jules.vrn']);

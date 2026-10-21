@@ -1,6 +1,6 @@
 # T’as cru j’étais ton fan ? — notes pour Claude Code
 
-App web (PWA) d'audit des abonnés Instagram, pensée d'abord pour iPhone. Elle lit les exports officiels d'Instagram (« Exporter vos informations », format JSON ou HTML, en .zip ou fichiers séparés), enregistre chaque export comme un instantané daté, et compare deux instantanés : départs (abonnés perdus), arrivées, comptes sans retour. Les départs que l'utilisateur suit encore sont mis en évidence.
+App web (PWA) d'audit des abonnés Instagram, pensée d'abord pour iPhone. Elle lit les exports officiels d'Instagram (« Exporter vos informations », format JSON ou HTML, en .zip ou fichiers séparés), enregistre chaque export comme un instantané daté, et compare deux instantanés : départs (abonnés perdus), arrivées, Fan Zone (comptes que l'utilisateur suit et qui ne le suivent pas ; identifiant `noBack` dans le code). Les départs que l'utilisateur suit encore sont mis en évidence.
 
 Règles importantes :
 - Jamais de connexion à Instagram, d'identifiants ou de scraping : uniquement les exports officiels.
@@ -15,7 +15,7 @@ Fichiers :
 - `src/body.html` : structure de la page
 - `src/style.css` : apparence
 - `src/js/parser.js` : lecture des exports
-- `src/js/compare.js` : calculs (départs, arrivées, sans retour, choix de période)
+- `src/js/compare.js` : calculs (départs, arrivées, Fan Zone, choix de période)
 - `src/js/storage.js` : IndexedDB, et base privée par utilisateur quand l'app tourne comme page Claude (`window.claude.use("db")`)
 - `src/js/files.js` : enregistrement de fichiers (CSV, sauvegarde)
 - `src/js/demo.js` : données d'exemple affichées sans export

@@ -38,7 +38,7 @@
     done: {},
     excluded: {},
     ghosts: {},
-    noBackView: 'list', // « Sans retour » : list | excluded | ghosts
+    noBackView: 'list', // « Fan Zone » : list | excluded | ghosts
     draft: null,
     view: 'audit',
     pendingDelete: null,
@@ -244,7 +244,7 @@
     renderFilters();
   }
 
-  // Applique les listes de l'utilisateur : fantômes masqués partout, exclus masqués de « Sans retour ».
+  // Applique les listes de l'utilisateur : fantômes masqués partout, exclus masqués de « Fan Zone ».
   // Les comptes masqués restent consultables avec les filtres « Exclus » (œil barré) et « Fantômes ».
   function renderFilters() {
     const { res, single } = state.result;
@@ -274,6 +274,17 @@
     return state.onlyFollowing && state.result && state.result.res.hasFollowing;
   }
 
+  // « Entre le … et le … » ; le même jour, avec l'heure de création des deux exports si elle est connue
+  function periodText(older, newer) {
+    if (isoDay(older.takenAt) !== isoDay(newer.takenAt)) {
+      return `Entre le ${dateLabel(older.takenAt)} et le ${dateLabel(newer.takenAt, true)}`;
+    }
+    const a = P.stampToInstant(older.stamp);
+    const b = P.stampToInstant(newer.stamp);
+    if (!a || !b) return `Entre deux exports du ${dateLabel(newer.takenAt, true)}`;
+    return `Entre le ${dateLabel(a)} à ${fmtTime.format(new Date(a))} et le ${dateLabel(b, true)} à ${fmtTime.format(new Date(b))}`;
+  }
+
   function renderHeadline() {
     const h = $('headline');
     h.textContent = '';
@@ -281,9 +292,7 @@
     const seg = state.seg;
     h.className = 'headline is-' + seg;
 
-    let period = '';
-    if (!single && isoDay(older.takenAt) === isoDay(newer.takenAt)) period = `Le ${dateLabel(newer.takenAt, true)}, entre deux exports`;
-    else if (!single) period = `Entre le ${dateLabel(older.takenAt)} et le ${dateLabel(newer.takenAt, true)}`;
+    const period = single ? '' : periodText(older, newer);
     const head = (kicker, n, label, sub) => h.append(
       el('p', { class: 'kicker', text: kicker }),
       el('div', { class: 'headline-num' }, [
@@ -394,7 +403,7 @@
     const seg = state.seg;
     const view = seg === 'noBack' ? state.noBackView : 'list';
     const hot = seg === 'lost' && r.stillFollowing;
-    // les actions (fantôme, exclure, traité) n'existent que sur « Sans retour »
+    // les actions (fantôme, exclure, traité) n'existent que sur « Fan Zone »
     const actionable = seg === 'noBack' && view === 'list';
     const done = actionable && !!state.done[r.u];
 

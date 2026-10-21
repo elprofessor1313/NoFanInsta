@@ -234,7 +234,7 @@
     return store;
   }
 
-  // Réglages : done = comptes cochés « Traité », excluded = comptes exclus de « Sans retour »,
+  // Réglages : done = comptes cochés « Traité », excluded = comptes exclus de « Fan Zone »,
   // ghosts = comptes fantômes (introuvables), masqués de toutes les listes.
   // Tous sont des { pseudo: date (ms) } ; on réunit ceux de l'appareil et ceux du compte Claude.
   function mergeSettings(a, b) {

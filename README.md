@@ -8,9 +8,9 @@ L'app ne se connecte jamais à Instagram et ne demande aucun mot de passe. Elle 
 
 - **Départs** : comptes qui te suivaient au début de la période et plus à la fin. Ceux que tu suis encore sont en tête, surlignés en rose, avec un bouton « Ouvrir » vers leur profil.
 - **Arrivées** : nouveaux abonnés sur la période.
-- Les actions (fantôme, exclure, traité) n’existent que dans « Sans retour » ; « Départs » et « Arrivées » sont en lecture seule.
-- **Sans retour** : comptes que tu suis et qui ne te suivent pas. Le grand chiffre en haut suit l’onglet choisi.
-- **Exclusions** : le bouton œil barré retire d’un coup un compte de « Sans retour » (star, artiste, marque…). La liste d’exclusion est gardée d’une analyse à l’autre, incluse dans la sauvegarde, et consultable avec le filtre « Exclus » pour réintégrer un compte.
+- Les actions (fantôme, exclure, traité) n’existent que dans « Fan Zone » ; « Départs » et « Arrivées » sont en lecture seule.
+- **Fan Zone** : comptes que tu suis et qui ne te suivent pas (ils t’ont mis dans leur fan zone). Le grand chiffre en haut suit l’onglet choisi.
+- **Exclusions** : le bouton œil barré retire d’un coup un compte de « Fan Zone » (star, artiste, marque…). La liste d’exclusion est gardée d’une analyse à l’autre, incluse dans la sauvegarde, et consultable avec le filtre « Exclus » pour réintégrer un compte.
 - **Fantômes** : le bouton fantôme range les comptes introuvables sur Instagram (désactivés, supprimés, faux comptes bannis) qui traînent encore dans l’export. Ils disparaissent de toutes les listes ; le filtre « Fantômes » permet de les faire revenir.
 - Périodes rapides (dernier écart, 1 mois, 3 mois, 1 an, tout) ou choix libre de deux exports.
 - Export CSV de chaque liste, sauvegarde et restauration de tous les exports.
@@ -33,7 +33,7 @@ src/
   body.html        structure de la page
   style.css        apparence (couleurs, polices, mise en page)
   js/parser.js     lecture des exports (ZIP, JSON, HTML) — sans bibliothèque
-  js/compare.js    calcul des départs, arrivées, sans retour, périodes
+  js/compare.js    calcul des départs, arrivées, Fan Zone, périodes
   js/storage.js    enregistrement (navigateur, ou compte Claude dans la version Claude)
   js/files.js      enregistrement des fichiers CSV / sauvegarde
   js/demo.js       données d'exemple affichées au premier lancement

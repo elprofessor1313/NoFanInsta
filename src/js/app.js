@@ -812,6 +812,7 @@
 
   async function start() {
     bind();
+    if (window.DESABOS_VERSION) $('app-version').textContent = 'Version ' + window.DESABOS_VERSION;
     state.store = Storage.createStore();
     await state.store.init(async () => {
       try { loadSettings(await state.store.getSettings()); } catch (e) { /* */ }

@@ -1,11 +1,16 @@
 // Service worker : permet d'ouvrir l'app sans connexion une fois installée.
-// __VERSION__ et __ASSETS__ sont remplis par build.mjs.
+// CACHE (version) et ASSETS (fichiers à garder hors connexion) sont remplis par build.mjs.
 const CACHE = 'tascru-__VERSION__';
 const OLD_PREFIXES = ['tascru-', 'desabos-']; // desabos- : caches de l'ancien nom
 const ASSETS = __ASSETS__;
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+  // cache: 'reload' : ignorer le cache HTTP (GitHub Pages garde les fichiers 10 minutes)
+  event.waitUntil(
+    caches.open(CACHE)
+      .then((c) => c.addAll(ASSETS.map((u) => new Request(u, { cache: 'reload' }))))
+      .then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener('activate', (event) => {
@@ -23,10 +28,10 @@ self.addEventListener('fetch', (event) => {
 
   if (url.origin !== self.location.origin) return;
 
-  // Page : réseau d'abord (pour recevoir les mises à jour), cache sinon
+  // Page : réseau d'abord (pour recevoir les mises à jour, sans passer par le cache HTTP), cache sinon
   if (req.mode === 'navigate') {
     event.respondWith(
-      fetch(req)
+      fetch(req.url, { cache: 'no-cache', credentials: 'same-origin' })
         .then((res) => { caches.open(CACHE).then((c) => c.put('index.html', res.clone())); return res; })
         .catch(() => caches.match('index.html'))
     );

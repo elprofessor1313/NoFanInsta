@@ -391,6 +391,7 @@ select {
   font-size: 12px; color: var(--muted); text-align: center; text-wrap: balance;
 }
 .legal p { margin: 0; }
+.legal .app-version { margin-top: 6px; font-family: var(--f-mono); opacity: .8; }
 
 /* ---------- Toast ---------- */
 .toast {

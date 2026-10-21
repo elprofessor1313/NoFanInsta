@@ -37,7 +37,7 @@ export function build({ quiet = false } = {}) {
   const js = SCRIPTS.map((f) => `/* ${f} */\n` + read(join('js', f))).join('\n');
   const fontsCss = read(join('fonts', 'fonts.css'));
   const fontFiles = readdirSync(join(SRC, 'fonts')).filter((f) => f.endsWith('.woff2'));
-  const version = pkg.version + '-' + createHash('sha256').update(css + body + js + fontsCss).digest('hex').slice(0, 8);
+  const version = pkg.version + '-' + createHash('sha256').update(css + body + js + fontsCss + read('sw.js')).digest('hex').slice(0, 8);
 
   const head = (fonts) => [
     `<title>${APP_NAME}</title>`,
@@ -80,7 +80,18 @@ export function build({ quiet = false } = {}) {
   ].join('\n');
   const swRegister = inlineScript(
     "if ('serviceWorker' in navigator && location.protocol !== 'file:') {\n" +
-    "  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));\n" +
+    // Nouvelle version installée → recharger la page (pas au tout premier chargement)
+    "  const hadController = !!navigator.serviceWorker.controller;\n" +
+    "  let reloading = false;\n" +
+    "  navigator.serviceWorker.addEventListener('controllerchange', () => {\n" +
+    "    if (hadController && !reloading) { reloading = true; location.reload(); }\n" +
+    "  });\n" +
+    "  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').then((reg) => {\n" +
+    // Sur iPhone, l'app installée reprend sans se recharger : chercher une mise à jour à chaque retour
+    "    document.addEventListener('visibilitychange', () => {\n" +
+    "      if (document.visibilityState === 'visible') reg.update().catch(() => {});\n" +
+    "    });\n" +
+    "  }).catch(() => {}));\n" +
     '}'
   );
   const web = `<!doctype html>\n<html lang="fr" class="pwa">\n<head>\n${pwaHead}\n${head(localFonts)}\n</head>\n<body>\n${body}\n${scripts}\n${swRegister}\n</body>\n</html>\n`;
@@ -111,6 +122,8 @@ export function build({ quiet = false } = {}) {
   const sw = read('sw.js')
     .replace('__VERSION__', version)
     .replace('__ASSETS__', JSON.stringify(['./', 'index.html', 'manifest.webmanifest', ...icons.map((f) => 'icons/' + f), ...fontFiles.map((f) => 'fonts/' + f)]));
+  // un marqueur oublié casse le service worker (plus de hors connexion ni de mise à jour) : refuser le build
+  if (/__VERSION__|__ASSETS__/.test(sw)) throw new Error('sw.js : marqueur __VERSION__ ou __ASSETS__ non remplacé');
   writeFileSync(join(DIST, 'web', 'sw.js'), sw);
 
   // 2) Version page Claude (sans doctype ni <head> : Claude ajoute le squelette)

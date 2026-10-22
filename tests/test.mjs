@@ -213,18 +213,34 @@ await test('Texte de la période (avec l’heure le même jour)', () => {
   assert.equal(F.periodText(snap('2026-10-21'), snap('2026-10-21'), now), 'Entre deux exports du 21 oct. 2026');
 });
 
-await test('Libellés des exports : n°1, n°2 le même jour, heure de création', () => {
-  const now = Date.UTC(2026, 9, 22);
-  const a = { takenAt: F.msFromIso('2026-10-21'), stamp: Date.UTC(2026, 9, 21, 13, 55) };
-  const b = { takenAt: F.msFromIso('2026-10-21'), stamp: Date.UTC(2026, 9, 21, 15, 7) };
+await test('Libellés des exports : jour et heure réels de création, n° sans heure connue', () => {
+  // Instagram date les trois archives du 21 oct. (Californie) ; créées à 22:55, 23:47 et 00:07 à Paris
+  const exp = (h, mi) => ({ takenAt: F.msFromIso('2026-10-21'), stamp: Date.UTC(2026, 9, 21, h, mi) });
+  const a = exp(13, 55);
+  const d = exp(14, 47);
+  const b = exp(15, 7);
   const c = { takenAt: F.msFromIso('2026-09-18'), stamp: null };
-  const metas = [c, a, b];
-  assert.equal(F.snapLabel(a, metas), '21 oct. 2026 · n°1');
-  assert.equal(F.snapLabel(b, metas), '21 oct. 2026 · n°2');
+  const metas = [c, a, d, b];
+  assert.equal(F.snapLabel(a, metas), '21 oct. 2026 · 22:55');
+  assert.equal(F.snapLabel(d, metas), '21 oct. 2026 · 23:47');
+  assert.equal(F.snapLabel(b, metas), '22 oct. 2026'); // créé après minuit en France : un autre jour
   assert.equal(F.snapLabel(c, metas), '18 sept. 2026');
-  assert.deepEqual(F.snapDateTime(a, metas, now), { date: 'mer. 21 oct. 2026', time: '· 22:55' });
-  assert.deepEqual(F.snapDateTime(b, metas, now), { date: 'mer. 21 oct. 2026', time: '· 00:07 le 22 oct.' });
-  assert.deepEqual(F.snapDateTime(c, metas, now), { date: 'ven. 18 sept. 2026', time: null });
+  assert.deepEqual(F.snapDateTime(a, metas), { date: 'mer. 21 oct. 2026', time: '· 22:55' });
+  assert.deepEqual(F.snapDateTime(b, metas), { date: 'jeu. 22 oct. 2026', time: '· 00:07' });
+  assert.deepEqual(F.snapDateTime(c, metas), { date: 'ven. 18 sept. 2026', time: null });
+  // sans heure connue, deux exports du même jour sont numérotés
+  const x = { takenAt: F.msFromIso('2026-09-18'), stamp: null };
+  assert.equal(F.snapLabel(x, [c, x]), '18 sept. 2026 · n°2');
+});
+
+await test('Durée comparée et jour proposé à l’import', () => {
+  const exp = (h, mi) => ({ takenAt: F.msFromIso('2026-10-21'), stamp: Date.UTC(2026, 9, 21, h, mi) });
+  assert.equal(F.gapText(exp(14, 47), exp(15, 7)), '20 minutes');
+  assert.equal(F.gapText(exp(13, 55), exp(15, 7)), '1 h 12 min');
+  assert.equal(F.gapText({ takenAt: F.msFromIso('2026-09-18') }, { takenAt: F.msFromIso('2026-10-22') }), '34 jours');
+  assert.equal(F.gapText({ takenAt: F.msFromIso('2026-10-21') }, { takenAt: F.msFromIso('2026-10-21') }), 'le même jour');
+  assert.equal(F.importDay({ date: '2026-10-21', stamp: Date.UTC(2026, 9, 21, 15, 7) }), '2026-10-22');
+  assert.equal(F.importDay({ date: '2026-10-21', stamp: null }), '2026-10-21');
 });
 
 await test('CSV : guillemets, virgules et BOM', () => {

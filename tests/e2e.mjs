@@ -144,22 +144,24 @@ try {
     writeFileSync(second, instagramZip(['ami.un', 'ami.deux'], ['ami.un', 'ami.deux', 'star.mondiale'], dos(2026, 10, 21, 15, 7)));
     const { root } = await send('DOM.getDocument');
     const { nodeId } = await send('DOM.querySelector', { nodeId: root.nodeId, selector: '#file-input' });
-    for (const file of [second, first]) {
+    // date proposée : jour réel de création à Paris (15:07 en Californie = 00:07 le 22 à Paris)
+    for (const [file, day] of [[second, '2026-10-22'], [first, '2026-10-21']]) {
       await send('DOM.setFileInputFiles', { nodeId, files: [file] });
       await until(`!document.getElementById('draft').hidden`, 'vérification de l’export');
-      assert.equal(await js(`document.getElementById('draft-date').value`), '2026-10-21');
+      assert.equal(await js(`document.getElementById('draft-date').value`), day);
       await click('#draft-save');
       await until(`document.getElementById('draft').hidden`, 'enregistrement');
     }
     await until(`document.getElementById('n-lost').textContent === '1'`, 'départ détecté');
     assert.deepEqual(await counts(), { lost: '1', gained: '0', noBack: '1' });
     assert.deepEqual(await handles(), ['@parti.vite']);
-    assert.equal(await js(`document.getElementById('sel-from').selectedOptions[0].text`), '21 oct. 2026 · n°1');
-    assert.equal(await js(`document.getElementById('sel-to').selectedOptions[0].text`), '21 oct. 2026 · n°2');
+    assert.equal(await js(`document.getElementById('sel-from').selectedOptions[0].text`), '21 oct. 2026');
+    assert.equal(await js(`document.getElementById('sel-to').selectedOptions[0].text`), '22 oct. 2026');
+    assert.equal(await text('#period-note'), 'Période comparée : 1 h 12 min.');
     assert.equal(await text('.headline-sub'), 'Entre le 21 oct. à 22:55 et le 22 oct. 2026 à 00:07, dont 0 que tu suis encore.');
     await click('#tab-exports');
     assert.deepEqual(await js(`[...document.querySelectorAll('.snap-date')].map((d) => d.textContent)`),
-      ['mer. 21 oct. 2026 · 00:07 le 22 oct.', 'mer. 21 oct. 2026 · 22:55']);
+      ['jeu. 22 oct. 2026 · 00:07', 'mer. 21 oct. 2026 · 22:55']);
   });
 
   console.log('Version installée');

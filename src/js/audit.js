@@ -101,8 +101,8 @@
         note.append('Choisis deux exports différents pour comparer.');
         return;
       }
-      const days = C.daysBetween(a.takenAt, b.takenAt);
-      note.append('Période comparée : ', el('strong', { text: days ? F.count(days, 'jour', 'jours') : 'le même jour' }), '.');
+      const [older, newer] = C.snapOrder(a, b) <= 0 ? [a, b] : [b, a];
+      note.append('Période comparée : ', el('strong', { text: F.gapText(older, newer) }), '.');
       if (!state.rangeExact) note.append(' Aucun export assez ancien : la comparaison part du plus ancien disponible.');
     }
 
@@ -170,7 +170,7 @@
         const hidden = [];
         if (res.noBackExcluded.length) hidden.push(F.count(res.noBackExcluded.length, 'exclu', 'exclus'));
         if (res.noBackGhosts) hidden.push(F.count(res.noBackGhosts, 'fantôme', 'fantômes'));
-        const text = `Tu les suis, eux non. D’après ton export du ${F.dateLabel(newer.takenAt, true)}.` +
+        const text = `Tu les suis, eux non. D’après ton export du ${F.dateLabel(F.moment(newer), true)}.` +
           (hidden.length ? ` Masqués : ${hidden.join(' et ')}.` : '');
         show('🙄 T’as cru ?', n, F.plural(n, 'ne te suit pas en retour', 'ne te suivent pas en retour'),
           el('p', { class: 'headline-sub', text }));
@@ -331,7 +331,8 @@
         r.u, `https://www.instagram.com/${r.u}/`, status(r), r.since ? F.isoDay(r.since * 1000) : '',
       ]));
       const { older, newer, single } = state.result;
-      const dates = single ? F.isoDay(newer.takenAt) : `${F.isoDay(older.takenAt)}_${F.isoDay(newer.takenAt)}`;
+      const day = (s) => F.isoDay(F.moment(s));
+      const dates = single ? day(newer) : `${day(older)}_${day(newer)}`;
       const r = await Files.saveFile(`tas-cru-${CSV_NAMES[key]}-${dates}.csv`, Files.csv(rows), 'text/csv');
       ctx.reportSave(r, 'Liste exportée.');
     }

@@ -41,7 +41,7 @@
           el('button', { type: 'button', class: 'btn btn-small', 'data-cancel': m.id, text: 'Non' }),
           el('button', { type: 'button', class: 'btn btn-small btn-danger', 'data-confirm': m.id, text: 'Oui' }),
         ]
-        : [el('button', { type: 'button', class: 'btn btn-small', 'data-delete': m.id, 'aria-label': `Supprimer l'export du ${F.dateLabel(m.takenAt, true)}`, text: 'Supprimer' })];
+        : [el('button', { type: 'button', class: 'btn btn-small', 'data-delete': m.id, 'aria-label': `Supprimer l'export du ${F.dateLabel(F.moment(m), true)}`, text: 'Supprimer' })];
       return el('li', { class: 'snap' }, [
         el('div', {}, [
           el('div', { class: 'snap-date' }, time ? [date + ' ', el('span', { class: 'snap-time', text: time })] : date),
@@ -102,13 +102,13 @@
 
     /** Affiche l'export lu pour vérification, avec ses avertissements. */
     function showDraft(parsed) {
-      const date = parsed.date || F.isoDay(Date.now());
+      const date = F.importDay(parsed);
       const warnings = [];
       if (!parsed.hasFollowing) warnings.push('following.json est absent : tu verras les départs, mais pas lesquels tu suis encore.');
       if (parsed.followers.size === 0) warnings.push('La liste d\'abonnés est vide. Vérifie que l\'export couvre la période « Depuis le début ».');
-      const sameDay = state.demo ? null : state.metas.find((m) => F.isoDay(m.takenAt) === date);
+      const sameDay = state.demo ? null : state.metas.find((m) => F.isoDay(F.moment(m)) === date);
       if (sameDay) {
-        const day = F.dateLabel(sameDay.takenAt, true);
+        const day = F.dateLabel(F.moment(sameDay), true);
         warnings.push(parsed.stamp
           ? `Tu as déjà un export daté du ${day} : pas de souci, ils seront comparés dans l'ordre où Instagram les a créés.`
           : `Tu as déjà un export daté du ${day}. Vérifie la date : deux exports du même jour sont rangés dans l'ordre où tu les ajoutes.`);

@@ -129,9 +129,5 @@
     return { from: from.id, to: last.id, exact: true };
   }
 
-  function daysBetween(a, b) {
-    return Math.round(Math.abs(b - a) / DAY);
-  }
-
-  root.DesabosCompare = { diff, notFollowingBack, compareRange, splitExcluded, applyUserLists, snapOrder, pickRange, daysBetween, DAY };
+  root.DesabosCompare = { diff, notFollowingBack, compareRange, splitExcluded, applyUserLists, snapOrder, pickRange };
 })(typeof window !== 'undefined' ? window : globalThis);

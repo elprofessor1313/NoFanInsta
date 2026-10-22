@@ -45,7 +45,7 @@ src/
   sw.js, sw-register.js   fonctionnement hors connexion et mises à jour
   fonts/, icons/     polices (licence OFL) et icônes de l'app
 build.mjs            construit dist/
-icons.mjs            génère les icônes PNG (emoji 😎, police libre Noto Color Emoji)
+icons.mjs            génère les icônes PNG (appareil photo + emoji 😎, police libre Noto Color Emoji)
 serve.mjs            serveur local de développement
 tools/chrome.mjs     pilotage de Chrome pour les icônes et le test d'interface
 tests/test.mjs       tests de la logique

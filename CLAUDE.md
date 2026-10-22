@@ -34,7 +34,7 @@ Commandes :
 - `tools/chrome.mjs` : pilotage de Chrome partagé par `icons.mjs` et `tests/e2e.mjs` ; `tests/zip.mjs` : faux exports .zip pour les tests.
 - `npm run build` : produit `dist/web/` (site à publier) et `dist/claude-artifact.html` (version page Claude).
 - `npm run dev` : serveur local sur le port 5173, reconstruit à chaque rechargement.
-- `npm run icons` : régénère `src/icons/*.png` (emoji 😎 de la police libre Noto Color Emoji sur fond `--accent`), rendu par Chrome ou Edge en headless (`icons.mjs`, Node 22+, connexion internet). À lancer après un changement d'emoji ou de `--accent`, puis `npm run build`.
+- `npm run icons` : régénère `src/icons/*.png` (appareil photo dessiné en CSS, flash en haut à droite, emoji 😎 de la police libre Noto Color Emoji dans l'objectif ; ne jamais reprendre le logo d'Instagram, marque de Meta), rendu par Chrome ou Edge en headless (`icons.mjs`, Node 22+, connexion internet). À lancer après un changement d'emoji ou de `--accent`, puis `npm run build`.
 - Emojis : dans la page, toujours des caractères (😎 logo, 🧐 départs), qui prennent le dessin du système (Apple sur iPhone). Ne jamais intégrer d'image des emojis d'Apple : ils sont protégés.
 
 Ne pas modifier `dist/` à la main : il est régénéré par le build. Il n'est pas suivi par git.

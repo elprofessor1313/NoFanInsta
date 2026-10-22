@@ -1,28 +1,31 @@
 /* Layout : une colonne étroite façon app iPhone, en-tête collant, cartes à bord épais et ombre décalée. */
 :root {
-  --bg: #fff5e9;
-  --dots: #f0e0cb;
+  /* Palette chaude inspirée d'Instagram : magenta, violet, orange, jaune (teintes propres à l'app) */
+  --bg: #fff7f4;
+  --dots: #f5e1da;
   --surface: #ffffff;
-  --ink: #1f1530;
-  --muted: #6a5d7b;
-  --line: #eadfce;
-  --edge: #1f1530;
-  --accent: #6b3cf5;
+  --ink: #26121f;
+  --muted: #74596a;
+  --line: #f0dfe0;
+  --edge: #26121f;
+  --accent: #c2187a;
+  --accent-2: #7b2fbf;
   --accent-ink: #ffffff;
-  --accent-soft: #ece5ff;
-  --pop: #ffd23f;
-  --pop-ink: #1f1530;
-  --alert: #d81b60;
+  --accent-soft: #fde4f1;
+  --grad: linear-gradient(135deg, var(--accent), var(--accent-2));
+  --pop: #ffcd4b;
+  --pop-ink: #26121f;
+  --alert: #d63a1f;
   --alert-ink: #ffffff;
-  --alert-soft: #ffe1ec;
+  --alert-soft: #ffe5dc;
   --ok: #13805a;
   --ok-soft: #d9f4e6;
-  --card-lost: #ffc9dc;
-  --card-gained: #bff0d6;
-  --card-noBack: #ffd23f;
-  --hl-ink: #1f1530;
-  --av1: #ffd23f; --av2: #ff9ec2; --av3: #a8e6cf; --av4: #b9a7ff; --av5: #ffb37a; --av6: #8fd3ff;
-  --av-ink: #1f1530;
+  --card-lost: #ffd3e6;
+  --card-gained: #ffe0c2;
+  --card-noBack: #e9dbff;
+  --hl-ink: #26121f;
+  --av1: #ffcd4b; --av2: #ff9cc8; --av3: #ffb27a; --av4: #c9a6ff; --av5: #ff8f8f; --av6: #ffd9a8;
+  --av-ink: #26121f;
 
   --f-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
   --f-body: "Instrument Sans", -apple-system, "Segoe UI", system-ui, sans-serif;
@@ -35,18 +38,18 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #150f1d; --dots: #231a2f; --surface: #20182b; --ink: #f7f1ff; --muted: #b3a8c4; --line: #352a44; --edge: #5c4a78;
-    --accent: #a68bff; --accent-ink: #150f1d; --accent-soft: #2e2448; --pop: #ffd23f; --pop-ink: #1f1530;
-    --alert: #ff6f9f; --alert-ink: #150f1d; --alert-soft: #3d1a2c; --ok: #4fd39a; --ok-soft: #15332a;
-    --card-lost: #4a1d33; --card-gained: #163a2c; --card-noBack: #4a3c0e; --hl-ink: #f7f1ff;
+    --bg: #170e14; --dots: #26161f; --surface: #22161d; --ink: #fbeef5; --muted: #c6a9ba; --line: #3b2532; --edge: #6e4a60;
+    --accent: #ff5fae; --accent-2: #b98cff; --accent-ink: #170e14; --accent-soft: #3c1a2e; --pop: #ffcd4b; --pop-ink: #26121f;
+    --alert: #ff7a59; --alert-ink: #170e14; --alert-soft: #3f1d17; --ok: #4fd39a; --ok-soft: #15332a;
+    --card-lost: #4b1c34; --card-gained: #4a2a14; --card-noBack: #33204d; --hl-ink: #fbeef5;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #150f1d; --dots: #231a2f; --surface: #20182b; --ink: #f7f1ff; --muted: #b3a8c4; --line: #352a44; --edge: #5c4a78;
-  --accent: #a68bff; --accent-ink: #150f1d; --accent-soft: #2e2448; --pop: #ffd23f; --pop-ink: #1f1530;
-  --alert: #ff6f9f; --alert-ink: #150f1d; --alert-soft: #3d1a2c; --ok: #4fd39a; --ok-soft: #15332a;
-  --card-lost: #4a1d33; --card-gained: #163a2c; --card-noBack: #4a3c0e; --hl-ink: #f7f1ff;
+  --bg: #170e14; --dots: #26161f; --surface: #22161d; --ink: #fbeef5; --muted: #c6a9ba; --line: #3b2532; --edge: #6e4a60;
+  --accent: #ff5fae; --accent-2: #b98cff; --accent-ink: #170e14; --accent-soft: #3c1a2e; --pop: #ffcd4b; --pop-ink: #26121f;
+  --alert: #ff7a59; --alert-ink: #170e14; --alert-soft: #3f1d17; --ok: #4fd39a; --ok-soft: #15332a;
+  --card-lost: #4b1c34; --card-gained: #4a2a14; --card-noBack: #33204d; --hl-ink: #fbeef5;
   color-scheme: dark;
 }
 
@@ -94,7 +97,7 @@ code { font-family: var(--f-mono); font-size: .86em; background: var(--accent-so
 
 .brand { display: flex; align-items: center; gap: 9px; min-width: 0; }
 .brand-mark {
-  width: 36px; height: 36px; border-radius: 11px; background: var(--accent); flex: none;
+  width: 36px; height: 36px; border-radius: 11px; background: var(--grad); flex: none;
   display: grid; place-items: center; border: var(--bw) solid var(--edge); transform: rotate(-6deg);
   font-size: 23px; line-height: 1;
 }
@@ -120,7 +123,7 @@ code { font-family: var(--f-mono); font-size: .86em; background: var(--accent-so
 }
 .btn:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--edge); }
 .btn:disabled { opacity: .45; cursor: default; transform: none; box-shadow: 3px 3px 0 var(--edge); }
-.btn-primary { background: var(--accent); color: var(--accent-ink); }
+.btn-primary { background: var(--grad); color: var(--accent-ink); }
 .btn-block { width: 100%; }
 .btn-small { min-height: 34px; padding: 0 12px; font-size: 14px; border-radius: 10px; box-shadow: 2px 2px 0 var(--edge); }
 .btn-small:active { transform: translate(2px, 2px); }
@@ -198,7 +201,7 @@ select {
   display: flex; flex-direction: column; align-items: center; gap: 4px; /* libellé, puis compteur dessous */
 }
 .seg-label { white-space: nowrap; }
-.seg[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); }
+.seg[aria-selected="true"] { background: var(--grad); color: var(--accent-ink); }
 .seg-n {
   font-variant-numeric: tabular-nums; font-weight: 700; font-size: 12px;
   padding: 0 7px; border-radius: 999px; background: var(--bg); color: var(--ink);
@@ -351,7 +354,7 @@ select {
 .help-card .h2 { display: flex; align-items: center; gap: 10px; }
 .step-n {
   flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center;
-  background: var(--accent); color: var(--accent-ink); font: 800 16px/1 var(--f-display); border: var(--bw) solid var(--edge);
+  background: var(--grad); color: var(--accent-ink); font: 800 16px/1 var(--f-display); border: var(--bw) solid var(--edge);
 }
 .steps { margin: 0; padding: 0; list-style: none; counter-reset: step; display: grid; gap: 10px; font-size: 14px; }
 .steps > li { counter-increment: step; position: relative; padding-left: 34px; min-height: 24px; }

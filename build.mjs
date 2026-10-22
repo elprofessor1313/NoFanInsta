@@ -26,8 +26,8 @@ const SCRIPTS = ['parser.js', 'compare.js', 'storage.js', 'format.js', 'files.js
 
 const APP_NAME = 'T’as cru j’étais ton fan ?';
 const SHORT_NAME = 'T’as cru ?'; // nom sous l'icône de l'écran d'accueil (12 caractères au plus)
-const THEME_LIGHT = '#fff5e9';
-const THEME_DARK = '#150f1d';
+const THEME_LIGHT = '#fff7f4';
+const THEME_DARK = '#170e14';
 const FONTS = 'https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=IBM+Plex+Mono:wght@500&family=Instrument+Sans:wght@400;500;600;700&display=swap';
 
 const read = (p) => readFileSync(join(SRC, p), 'utf8');
@@ -39,7 +39,12 @@ export function build({ quiet = false } = {}) {
   const js = SCRIPTS.map((f) => `/* ${f} */\n` + read(join('js', f))).join('\n');
   const fontsCss = read(join('fonts', 'fonts.css'));
   const fontFiles = readdirSync(join(SRC, 'fonts')).filter((f) => f.endsWith('.woff2'));
-  const version = pkg.version + '-' + createHash('sha256').update(css + body + js + fontsCss + read('sw.js') + read('sw-register.js')).digest('hex').slice(0, 8);
+  const icons = readdirSync(join(SRC, 'icons')).filter((f) => f.endsWith('.png'));
+  // la version change dès qu'un fichier publié change (sinon le service worker garderait l'ancien en cache)
+  const hash = createHash('sha256').update(css + body + js + fontsCss + read('sw.js') + read('sw-register.js'));
+  for (const f of icons) hash.update(readFileSync(join(SRC, 'icons', f)));
+  for (const f of fontFiles) hash.update(readFileSync(join(SRC, 'fonts', f)));
+  const version = pkg.version + '-' + hash.digest('hex').slice(0, 8);
 
   const head = (fonts) => [
     `<title>${APP_NAME}</title>`,
@@ -102,7 +107,6 @@ export function build({ quiet = false } = {}) {
   };
   writeFileSync(join(DIST, 'web', 'manifest.webmanifest'), JSON.stringify(manifest, null, 2));
 
-  const icons = readdirSync(join(SRC, 'icons')).filter((f) => f.endsWith('.png'));
   for (const f of icons) copyFileSync(join(SRC, 'icons', f), join(DIST, 'web', 'icons', f));
   for (const f of [...fontFiles, 'LICENSES.md']) copyFileSync(join(SRC, 'fonts', f), join(DIST, 'web', 'fonts', f));
 

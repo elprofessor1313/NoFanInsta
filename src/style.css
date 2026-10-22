@@ -20,6 +20,8 @@
   --alert-soft: #ffe5dc;
   --ok: #13805a;
   --ok-soft: #d9f4e6;
+  --sign-red: #e0243d;
+  --sign-white: #ffffff;
   --card-lost: #ffd3e6;
   --card-gained: #ffe0c2;
   --card-noBack: #e9dbff;
@@ -99,8 +101,34 @@ code { font-family: var(--f-mono); font-size: .86em; background: var(--accent-so
 .brand-mark {
   width: 36px; height: 36px; border-radius: 11px; background: var(--grad); flex: none;
   display: grid; place-items: center; border: var(--bw) solid var(--edge); transform: rotate(-6deg);
-  font-size: 23px; line-height: 1;
 }
+.brand-mark .app-logo { font-size: .32px; }
+
+/*
+ * Logo de l'app : panneau d'interdiction sur 😍 (« ici, on n'est le fan de personne ») et sous-panneau
+ * « FAN ZONE ». Dessiné sur une grille de 100 × 100 em : la taille vient du font-size du logo.
+ * Repris par icons.mjs pour les icônes ; .is-compact (en-tête) agrandit le panneau sans sous-panneau.
+ */
+.app-logo { position: relative; display: block; width: 100em; height: 100em; line-height: 1; }
+.app-logo > * { position: absolute; box-sizing: border-box; }
+.logo-sign {
+  left: 19em; top: 6em; width: 62em; height: 62em; border-radius: 50%; overflow: hidden;
+  display: grid; place-items: center; background: var(--sign-white);
+  border: 7.5em solid var(--sign-red); outline: 3em solid var(--edge); box-shadow: 3.5em 3.5em 0 2.5em var(--edge);
+}
+.logo-sign .emo { font-size: 36em; }
+.logo-bar {
+  position: absolute; left: 50%; top: 50%; width: 120%; height: 8em; background: var(--sign-red);
+  transform: translate(-50%, -50%) rotate(45deg); box-shadow: 0 0 0 1.5em var(--sign-white);
+}
+.logo-plate {
+  left: 17em; top: 74em; width: 66em; height: 18em; border-radius: 4em; background: var(--edge);
+  display: grid; place-items: center; color: var(--pop);
+}
+.logo-plate span { font: 800 11.5em/1 var(--f-display); letter-spacing: .02em; white-space: nowrap; }
+.app-logo.is-compact .logo-sign { left: 6em; top: 6em; width: 88em; height: 88em; box-shadow: none; }
+.app-logo.is-compact .logo-sign .emo { font-size: 50em; }
+.app-logo.is-compact .logo-plate { display: none; }
 .brand-name { font: 800 16px/1.02 var(--f-display); letter-spacing: -.02em; }
 .brand-name em { font-style: normal; color: var(--alert); }
 
